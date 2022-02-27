@@ -1,0 +1,90 @@
+<html>
+	<title>Sixty Minutes Twenty-four Hours</title>
+<style>
+			html, body, div, span, applet, object, iframe,
+			h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+			a, abbr, acronym, address, big, cite, code,
+			del, dfn, em, img, ins, kbd, q, s, samp,
+			small, strike, strong, sub, sup, tt, var,
+			b, u, i, center,
+			dl, dt, dd, ol, ul, li,
+			fieldset, form, label, legend,
+			table, caption, tbody, tfoot, thead, tr, th, td,
+			article, aside, canvas, details, embed, 
+			figure, figcaption, footer, header, hgroup, 
+			menu, nav, output, ruby, section, summary,
+			time, mark, audio, video {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				font-size: 100%;
+				font: inherit;
+				vertical-align: baseline;
+			}
+	img{
+		width: 100%;
+	}
+
+</style>
+<body>
+
+<div id='container'>
+	<div id='controlbar'>
+		<button type='button' id='startButton'>start</button>
+		<button type='button' id='stopButton'>stop</button>
+	</div>	
+</div>
+<script>
+	document.body.setAttribute('style','display:grid; grid-template-columns: 1fr; grid-auto-rows:auto; row-gap:10px;');
+	document.getElementById('container').setAttribute('style','width:100%; grid-column:1 / 2; grid-row: 1 / 2; display:grid; grid-template-columns:repeat(10,1fr);  column-gap: 10px; row-gap: 10px;');
+	document.getElementById('controlbar').setAttribute('style','width:100%; grid-column:1 / 2; grid-row: 1 / 2;');
+	
+	const video = document.createElement('video');
+	video.setAttribute('autoplay','');
+	navigator.mediaDevices.getUserMedia({video: true})
+		.then((stream) => {video.srcObject = stream});
+
+	function capture() {
+		var canvas = document.createElement('canvas');
+		canvas.width = video.videoWidth;
+		canvas.height = video.videoHeight;
+		canvas.getContext('2d').drawImage(video, 0, 0);
+		// block
+		var block = document.createElement('div');
+		block.setAttribute('id', 'block'+k);
+		// img
+		var screenshot = document.createElement('img');
+		screenshot.setAttribute('src', canvas.toDataURL('image/jpg') );
+		screenshot.setAttribute('id', 'img'+k);
+		document.getElementById('container').appendChild(block);
+		document.getElementById('block'+k).appendChild(screenshot); 
+
+		const d = new Date();
+		let dateTime = d.toLocaleString();
+
+		var time = document.createElement('p');
+		time.innerHTML = dateTime;
+		document.getElementById('block'+k).appendChild(time);
+	};
+
+	var k = 1;
+	var interval;
+	document.getElementById('startButton').onclick = function(){
+		document.getElementById('startButton').innerHTML = 'start';
+		capture();
+		interval = setInterval(function(){
+			k++
+			capture();
+			if(k===60){
+				clearInterval(interval);
+			}
+		}, 3600000);
+	}
+	document.getElementById('stopButton').onclick = function(){
+		clearInterval(interval);
+		document.getElementById('startButton').innerHTML = 'resume';
+	}
+
+</script>
+</body>
+</html>
